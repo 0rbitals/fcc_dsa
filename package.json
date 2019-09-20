@@ -1,0 +1,16 @@
+{
+  "name": "fcc_dsa",
+  "version": "1.0.0",
+  "description": "FreeCodeCamp Algorithms & Data Structures Projects",
+  "main": "solution.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Mahdi Sharif",
+  "license": "MIT",
+  "devDependencies": {
+    "eslint": "^6.4.0",
+    "eslint-config-airbnb-base": "^14.0.0",
+    "eslint-plugin-import": "^2.18.2"
+  }
+}
