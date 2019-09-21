@@ -1,51 +1,59 @@
 function checkCashRegister(price, cash, cid) {
-  let result = {
+  let change = parseFloat(cash - price).toFixed(2);
+  const result = {
     status: '',
     change: [],
   };
-  let total = 0;
-  const difference = cash - price;
-  const currency = {
-    PENNY: 0.01,
-    NICKEL: 0.05,
-    DIME: 0.1,
+  const denomObj = {
+    'ONE HUNDRED': 100.0,
+    TWENTY: 20.0,
+    TEN: 10.0,
+    FIVE: 5.0,
+    ONE: 1.0,
     QUARTER: 0.25,
-    ONE: 1,
-    FIVE: 5,
-    TEN: 10,
-    TWENTY: 20,
-    'ONE HUNDRED': 100,
+    DIME: 0.1,
+    NICKEL: 0.05,
+    PENNY: 0.01,
   };
   cid.reverse();
-  result.change.reverse();
-  Object.values(cid).forEach((value) => {
-    let amount = 0;
-    while (amount < value[1] && total !== difference) {
-      amount += currency[value[0]];
-      total += currency[value[0]];
-      if (total >= difference) {
-        total -= currency[value[0]];
-        result.change.pop();
-      }
+  for (let i = 0; i < cid.length; i++) {
+    const denom = cid[i][0];
+    const sumOfDenom = cid[i][1];
+    const denomValue = denomObj[denom];
+    let denomAvailable = sumOfDenom / denomValue.toFixed(2);
+    let denomCounter = 0;
+
+    if (denomValue * denomCounter == change) {
+      result.status = 'OPEN';
+      return result;
     }
-  });
-  // Here is your change, ma'am.
-  return total;
+    while (change >= denomValue && denomAvailable > 0) {
+      change -= denomValue;
+      change = change.toFixed(2);
+      denomAvailable--;
+      denomCounter++;
+    }
+    if (denomCounter > 0) {
+      result.status = 'OPEN';
+      result.change.push([denom, denomCounter * denomValue]);
+    }
+  }
+  let sum = result.change
+    .map((val) => val[1])
+    .reduce((acc, next) => acc + next);
+  if (sum < cash - price) {
+    result.status = 'INSUFFICIENT_FUNDS';
+    result.change = [];
+  } else if (sum === cash - price) {
+    result.status = 'CLOSED';
+    result.change = cid.reverse();
+  }
+
+  return result;
 }
 
-// Example cash-in-drawer array:
-// [["PENNY", 1.01],
-// ["NICKEL", 2.05],
-// ["DIME", 3.1],
-// ["QUARTER", 4.25],
-// ["ONE", 90],
-// ["FIVE", 55],
-// ["TEN", 20],
-// ["TWENTY", 60],
-// ["ONE HUNDRED", 100]]
-
 console.log(
-  checkCashRegister(19.5, 20, [
+  checkCashRegister(3.26, 100, [
     ['PENNY', 1.01],
     ['NICKEL', 2.05],
     ['DIME', 3.1],
@@ -57,3 +65,18 @@ console.log(
     ['ONE HUNDRED', 100],
   ])
 );
+
+/*
+ Object.values(denoms)
+      .reverse()
+      .reduce((acc, curr) => {
+        if (curr < change) {
+          console.log(acc);
+          change -= acc;
+        } else {
+          return acc - curr;
+        }
+        console.log(change);
+        return acc + curr;
+      }, 0);
+      */
